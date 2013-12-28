@@ -1,0 +1,275 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Windows.Forms;
+using System.Text.RegularExpressions;
+using System.ComponentModel;
+using System.Drawing;
+using FrameWork.EnumLst;
+
+namespace FrameWork
+{
+    [ToolboxItem(true)]
+    [ToolboxBitmap(typeof(TextBox))]
+    public partial class AcisTextBox : TextBox
+    {
+        private InputLanguage arabic;
+        private InputLanguage english;
+
+        public TextType InPutType { get; set; }
+        public int MaxNumber { get; set; }
+        public int MinNumber { get; set; }
+        private bool _moveByEnter = false;
+        public bool MoveByEnter
+        {
+            get { return _moveByEnter; }
+            set { _moveByEnter = value; }
+        }
+
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+
+            if (e.KeyCode == Keys.Enter)
+                SendKeys.Send("{TAB}");
+
+            //if (e.KeyCode == Keys.C && e.Modifiers == Keys.Control)
+            //{
+            //    (this as TextBox).Copy();
+            //    return;
+            //}
+
+            //if (e.KeyCode == Keys.V && e.Modifiers == Keys.Control)
+            //{
+            //    (this as TextBox).Paste();
+            //    return;
+            //}
+
+            //if (e.KeyCode == Keys.A && e.Modifiers == Keys.Control)
+            //{
+            //    (this as TextBox).SelectAll();
+            //    return;
+            //}
+
+            base.OnKeyDown(e);
+
+        }
+
+        protected override void OnKeyPress(KeyPressEventArgs e)
+        {
+           
+
+
+            switch (InPutType)
+            {
+                case TextType.EnglishNumberWithSpace:
+                case TextType.EnglishOnlyWithSpace:
+                case TextType.EnglishOnlyWithNoSpace:
+                case TextType.EnglishNumberWithNoSpace:
+                    InputLanguage.CurrentInputLanguage = english;
+                    this.RightToLeft = System.Windows.Forms.RightToLeft.No;
+                    break;
+
+                case TextType.ArabicNumberWithNoSpace:
+                case TextType.ArabicNumberWithSpace:
+                case TextType.ArabicOnlyWithNoSpace:
+                case TextType.ArabicOnlyWithSpace:
+                    InputLanguage.CurrentInputLanguage = arabic;
+                    this.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+                    break;
+            }
+
+
+
+            if ((Keys)e.KeyChar == Keys.Back) return;
+            switch (InPutType)
+            {
+                case TextType.ArabicNumberWithNoSpace:
+                    if (!IsArabicCharacter(e.KeyChar) && !System.Text.RegularExpressions.Regex.IsMatch(e.KeyChar.ToString(), "[0-9]"))
+                        e.Handled = true;
+                    break;
+
+                case TextType.ArabicOnlyWithNoSpace:
+                    if (!IsArabicCharacter(e.KeyChar))
+                        e.Handled = true;
+                    break;
+
+                case TextType.ArabicOnlyWithSpace:
+                    if (!IsArabicCharacter(e.KeyChar) && (Keys)e.KeyChar != Keys.Space)
+                        e.Handled = true;
+                    break;
+
+                case TextType.ArabicNumberWithSpace:
+                    if (!IsArabicCharacter(e.KeyChar) && (Keys)e.KeyChar != Keys.Space && !System.Text.RegularExpressions.Regex.IsMatch(e.KeyChar.ToString(), "[0-9]"))
+                        e.Handled = true;
+                    break;
+
+                case TextType.EnglishOnlyWithSpace:
+                    if (!System.Text.RegularExpressions.Regex.IsMatch(e.KeyChar.ToString(), "[A-Za-z]") && (Keys)e.KeyChar != Keys.Space)
+                        e.Handled = true;
+                    break;
+
+                case TextType.EnglishNumberWithSpace:
+                    if (!System.Text.RegularExpressions.Regex.IsMatch(e.KeyChar.ToString(), "[A-Za-z0-9]") && (Keys)e.KeyChar != Keys.Space)
+                        e.Handled = true;
+                    break;
+
+                case TextType.EnglishNumberWithNoSpace:
+                    if (!System.Text.RegularExpressions.Regex.IsMatch(e.KeyChar.ToString(), "[A-Za-z0-9]"))
+                        e.Handled = true;
+                    break;
+
+                case TextType.EnglishOnlyWithNoSpace:
+                    if (!System.Text.RegularExpressions.Regex.IsMatch(e.KeyChar.ToString(), "[A-Za-z]"))
+                        e.Handled = true;
+                    break;
+
+                case TextType.Number:
+                    if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+                        e.Handled = true;
+                    break;
+
+                case TextType.LetterOnly:
+                    if (!char.IsControl(e.KeyChar) && !char.IsLetter(e.KeyChar))
+                        e.Handled = true;
+                    break;
+
+                case TextType.StringNoSpace:
+                    if (!char.IsControl(e.KeyChar) && !char.IsLetterOrDigit(e.KeyChar))
+                        e.Handled = true;
+                    break;
+
+                case TextType.String:
+                    break;
+
+                case TextType.Decimal:
+                    if (Char.IsDigit(e.KeyChar) || e.KeyChar == '\b')
+                    {
+                    }
+                    else if (e.KeyChar == '.' && !Text.Contains('.'))
+                    {
+                    }
+                    else
+                    {
+                        e.Handled = true;
+                    }
+                    break;
+            }
+            base.OnKeyPress(e);
+        }
+
+        protected override void OnLeave(EventArgs e)
+        {
+            if (InPutType == TextType.Number)
+            {
+                try
+                {
+                    if (Int64.Parse(Text) < MinNumber)
+                    {
+                        Text = MinNumber.ToString();
+                        return;
+                    }
+                    if (Int64.Parse(Text) > MaxNumber)
+                    {
+                        Text = MaxNumber.ToString();
+                        return;
+                    }
+                }
+                catch
+                {
+                    if (string.IsNullOrEmpty(Text)) return;
+                    Text = MaxNumber.ToString();
+                }
+            }
+            base.OnLeave(e);
+        }
+
+        public AcisTextBox()
+            : base()
+        {
+            InPutType = TextType.String;
+            MinNumber = 150;
+            MaxNumber = 214783648;
+
+            arabic = InputLanguage.CurrentInputLanguage;
+            english = InputLanguage.CurrentInputLanguage;
+            int count = InputLanguage.InstalledInputLanguages.Count;
+            for (int i = 0; i <= count - 1; i++)
+            {
+                if (InputLanguage.InstalledInputLanguages[i].LayoutName.Contains("Arabic"))
+                {
+                    arabic = InputLanguage.InstalledInputLanguages[i];
+                }
+                if (InputLanguage.InstalledInputLanguages[i].LayoutName.Contains("English"))
+                {
+                    english = InputLanguage.InstalledInputLanguages[i];
+                }
+            }
+        }
+
+        protected override void OnCreateControl()
+        {
+            base.OnCreateControl();
+        }
+
+        protected override void OnEnter(EventArgs e)
+        {
+            switch (InPutType)
+            {
+                case TextType.EnglishNumberWithSpace:
+                case TextType.EnglishOnlyWithSpace:
+                case TextType.EnglishOnlyWithNoSpace:
+                case TextType.EnglishNumberWithNoSpace:
+                    InputLanguage.CurrentInputLanguage = english;
+                    this.RightToLeft = System.Windows.Forms.RightToLeft.No;
+                    break;
+
+                case TextType.ArabicNumberWithNoSpace:
+                case TextType.ArabicNumberWithSpace:
+                case TextType.ArabicOnlyWithNoSpace:
+                case TextType.ArabicOnlyWithSpace:
+                    InputLanguage.CurrentInputLanguage = arabic;
+                    this.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+                    break;
+            }
+            base.OnEnter(e);
+        }
+
+        private bool IsArabicCharacter(Char character)
+        {
+            if (character >= 0x600 && character <= 0x6ff)
+                return true;
+            if (character >= 0x750 && character <= 0x77f)
+                return true;
+            if (character >= 0xfb50 && character <= 0xfc3f)
+                return true;
+            if (character >= 0xfe70 && character <= 0xfefc)
+                return true;
+
+            return false;
+        }
+
+
+
+        public static void OnKeyPressTxt(object sender, KeyPressEventArgs e)
+        {
+            TextBox xx = (TextBox)sender;
+            if (Char.IsDigit(e.KeyChar) || e.KeyChar == '\b')
+            {
+            }
+            else if (e.KeyChar == '.' && !xx.Text.Contains('.'))
+            {
+            }
+            else
+            {
+                e.Handled = true;
+            }
+
+        }
+    }
+
+
+
+
+}

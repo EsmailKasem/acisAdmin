@@ -1,0 +1,43 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using FrameWork.EnumLst;
+using System.Collections;
+
+namespace FrameWork
+{
+    public abstract class BusinessObject 
+    {
+        private List<BusinessRule> _businessRules = new List<BusinessRule>();
+        private List<string> _validationErrors = new List<string>();
+        public List<string> ValidationErrors
+        {
+            get { return _validationErrors; }
+        }
+     
+        protected void AddRule(BusinessRule rule)
+        {
+            _businessRules.Add(rule);
+        }
+
+        public bool Validate( Languages Lang = Languages.Arabic  )
+        {
+            bool isValid = true;
+            _validationErrors.Clear();
+
+            BusinessRule.Equals(Lang , null );
+
+            foreach (BusinessRule rule in _businessRules)
+            {
+               if (!rule.Validate(this))
+                {
+                    isValid = false;
+                    _validationErrors.Add( Lang == Languages.Arabic ? rule.ErrorMessage_AR : rule.ErrorMessage_En  );
+                }
+            }
+            return isValid;
+        }
+
+    }
+}

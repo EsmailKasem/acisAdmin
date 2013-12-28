@@ -1,0 +1,5 @@
+D:\ACCOUNT\AcisFrameWork\bin\Debug\AcisFrameWork.dll
+D:\ACCOUNT\AcisFrameWork\bin\Debug\AcisFrameWork.pdb
+D:\ACCOUNT\AcisFrameWork\obj\Debug\ResolveAssemblyReference.cache
+D:\ACCOUNT\AcisFrameWork\obj\Debug\AcisFrameWork.dll
+D:\ACCOUNT\AcisFrameWork\obj\Debug\AcisFrameWork.pdb

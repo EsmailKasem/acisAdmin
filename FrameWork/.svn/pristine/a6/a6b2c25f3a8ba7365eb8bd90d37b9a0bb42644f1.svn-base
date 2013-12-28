@@ -1,0 +1,156 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Data;
+using System.Linq;
+using System.Text;
+using System.Management;
+using System.Windows.Forms;
+
+namespace FrameWork
+{
+    [ToolboxItem(true)]
+    [ToolboxBitmap(typeof(StatusBar))]
+    public partial class AcisStatusBar : StatusStrip
+    {
+
+
+        public AcisStatusBar()
+        {
+            InitializeComponent();
+            Lbl_Language_Dt.Text = InputLanguage.CurrentInputLanguage.Culture.TwoLetterISOLanguageName.ToUpper();
+            this.Dock = DockStyle.Bottom;
+
+        }
+
+        protected override void OnLayoutCompleted(EventArgs e)
+        {
+            base.OnLayoutCompleted(e);
+            Lbl_Language_Dt.Text = InputLanguage.CurrentInputLanguage.Culture.TwoLetterISOLanguageName.ToUpper();
+            try
+            {
+                Form frm = (Form)this.Parent;
+                frm.InputLanguageChanged += new InputLanguageChangedEventHandler(frm_InputLanguageChanged);
+            }
+            catch (System.Exception ex)
+            {
+                if (System.Diagnostics.Debugger.IsAttached)
+                {
+                    throw new System.Exception();
+                }
+
+                ExceptionHelper.SaveExceptionLog(ex, System.Reflection.MethodBase.GetCurrentMethod());
+
+            }
+        }
+        void frm_InputLanguageChanged(object sender, InputLanguageChangedEventArgs e)
+        {
+            Lbl_Language_Dt.Text = e.InputLanguage.Culture.TwoLetterISOLanguageName.ToUpper();
+        }
+
+        #region Prop
+
+        private int _recordCount;
+
+        public int RecordCount
+        {
+            get { return _recordCount; }
+            set
+            {
+                _recordCount = value;
+                Lbl_RecordCount_Dt.Text = _recordCount.ToString();
+
+            }
+        }
+
+        private string _username = "Esmail";
+
+        public string UserName
+        {
+            get { return _username; }
+            set
+            {
+                _username = value;
+                Lbl_UserName_Dt.Text = _username;
+            }
+        }
+
+
+        private string _mode = "Read Only";
+
+        public string ModeBar
+        {
+            get { return _mode; }
+            set
+            {
+                _mode = value;
+                Lbl_Mode_Dt.Text = _mode;
+
+            }
+        }
+
+        private string _language;
+
+        public string Language
+        {
+            get { return _language; }
+            set
+            {
+                _language = value;
+                Lbl_Language_Dt.Text = _language;
+
+            }
+        }
+
+
+
+
+
+        #endregion
+
+
+        #region EnumList
+        public enum Mode
+        {
+            ReadOnly = 0
+
+        }
+
+
+        #endregion
+
+
+
+        private void statusStrip1_RightToLeftChanged(object sender, EventArgs e)
+        {
+            if (RightToLeft == System.Windows.Forms.RightToLeft.No)
+            {
+                Lbl_RecordCount.Text = "Record Count";
+                //Lbl_UserName.Text = "User Name";
+                Lbl_Mode.Text = "Mode";
+                //  Lbl_Lang.Text = "Language";
+                //  Lbl_Language_Dt.Text = "EN";
+            }
+            else if (RightToLeft == System.Windows.Forms.RightToLeft.Yes)
+            {
+                Lbl_RecordCount.Text = "عدد السجلات";
+                // Lbl_UserName.Text = "إسم المستخدم";
+                Lbl_Mode.Text = "الحالة";
+                //  Lbl_Lang.Text = "اللغه";
+                // Lbl_Language_Dt.Text = "AR";
+            }
+        }
+
+        //private void timer1_Tick(object sender, EventArgs e)
+        //{
+        //    //  Lbl_Language_Dt.Text =  InputLanguage.CurrentInputLanguage.LayoutName;
+        //    Lbl_Language_Dt.Text = InputLanguage.CurrentInputLanguage.Culture.TwoLetterISOLanguageName.ToUpper();
+
+        //}
+
+
+
+
+    }
+}

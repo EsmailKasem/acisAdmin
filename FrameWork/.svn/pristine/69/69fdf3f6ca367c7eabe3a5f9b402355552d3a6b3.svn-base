@@ -1,0 +1,30 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace FrameWork
+{
+  public static  class AppSetting
+    {
+
+      public static EnumLst.AppDbType DbType ;
+      public static string ConnDbAdmin = "";
+      public static string ConnDbAccount = "";
+
+
+      public static string GetDbConnString() 
+      {
+          switch (DbType) 
+          {
+              case EnumLst.AppDbType.Account:
+                  return @"Data Source=KADEL;Initial Catalog=test;Integrated Security=True";
+
+              case EnumLst.AppDbType.ACISBackOffice :
+                  return @"Data Source=WEB;Initial Catalog=ACISAdmin;User ID=sa;Password=sql2008/";
+          }
+
+          return @"Data Source=KADEL;Initial Catalog=test;Integrated Security=True";
+      }
+    }
+}

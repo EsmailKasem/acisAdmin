@@ -1,0 +1,200 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Data.Linq;
+using System.Windows.Forms;
+
+namespace FrameWork
+{
+    public static class Extensions
+    {
+        /*
+         * id =-1 
+         * int=0
+         * double=0.0
+         * string =string.empty
+         * datetime =1/1/0001 12:00:00 AM
+         * bool false
+         */
+        public static int AsId(this object item, int defaultId = -1)
+        {
+            if (item == null)
+                return defaultId;
+
+            int result;
+            if (!int.TryParse(item.ToString(), out result))
+                return defaultId;
+
+            return result;
+        }
+        public static int AsInt(this object item, int defaultInt = default(int))
+        {
+            if (item == null)
+                return defaultInt;
+
+            int result;
+            if (!int.TryParse(item.ToString(), out result))
+                return defaultInt;
+
+            return result;
+        }
+        public static Int64 AsInt64(this object item, int defaultInt = default(int))
+        {
+            if (item == null)
+                return defaultInt;
+
+            int result;
+            if (!int.TryParse(item.ToString(), out result))
+                return defaultInt;
+
+            return result;
+        }
+        public static double AsDouble(this object item, double defaultDouble = default(double))
+        {
+            if (item == null)
+                return defaultDouble;
+
+            double result;
+            if (!double.TryParse(item.ToString(), out result))
+                return defaultDouble;
+
+            return result;
+        }
+        public static string AsString(this object item, string defaultString = default(string))
+        {
+            if (item == null || item.Equals(System.DBNull.Value))
+                return defaultString;
+
+            return item.ToString().Trim();
+        }
+        public static DateTime AsDateTime(this object item, DateTime defaultDateTime = default(DateTime))
+        {
+            if (item == null || string.IsNullOrEmpty(item.ToString()))
+                return defaultDateTime;
+
+            DateTime result;
+            if (!DateTime.TryParse(item.ToString(), out result))
+                return defaultDateTime;
+
+            return result;
+        }
+        public static TimeSpan AsTime(this object item, TimeSpan defaultDateTime = default(TimeSpan))
+        {
+            if (item == null || string.IsNullOrEmpty(item.ToString()))
+                return defaultDateTime;
+            TimeSpan result;
+            try
+            {
+                 result = new TimeSpan(Convert.ToDateTime(item).Hour, Convert.ToDateTime(item).Minute, Convert.ToDateTime(item).Second);
+            }
+            catch 
+            {
+                 return defaultDateTime;
+            }
+            return result;
+        }
+        public static DateTime AsTimePaicker(this object item, DateTime defaultDateTime = default(DateTime))
+        {
+            if (item == null || string.IsNullOrEmpty(item.ToString()))
+                return defaultDateTime;
+
+
+            DateTime result = new DateTime
+                (
+                    DateTime.Now.Year ,
+                     DateTime.Now.Month,
+                      DateTime.Now.Day,
+                     ((TimeSpan) (item)).Hours,
+                    ((TimeSpan)(item)).Minutes,
+                    ((TimeSpan) (item)).Seconds
+                );
+
+            if (!DateTime.TryParse(item.ToString(), out result))
+                return defaultDateTime;
+
+            return result;
+        }
+
+
+        public static bool AsBool(this object item, bool defaultBool = default(bool))
+        {
+            if (item == null)
+                return defaultBool;
+
+            return new List<string>() { "yes", "y", "true" }.Contains(item.ToString().ToLower());
+        }
+        public static byte[] AsByteArray(this string s)
+        {
+            if (string.IsNullOrEmpty(s))
+                return null;
+
+            return Convert.FromBase64String(s);
+        }
+        public static string AsBase64String(this object item)
+        {
+            if (item == null)
+                return null;
+            ;
+
+            return Convert.ToBase64String((byte[]) item); 
+        }
+        public static string AsBase64String(this Binary item)
+        {
+            if (item == null)
+                return null;
+           
+            return Convert.ToBase64String(item.ToArray());
+        }
+        public static Binary AsBinary(this string s)
+        {
+            if (string.IsNullOrEmpty(s))
+                return null;
+
+            return new Binary(Convert.FromBase64String(s));
+        }
+        public static Guid AsGuid(this object item)
+        {
+            try { return new Guid(item.ToString()); }
+            catch { return Guid.Empty; }
+        }
+        public static string OrderBy(this string sql, string sortExpression)
+        {
+            if (string.IsNullOrEmpty(sortExpression))
+                return sql;
+
+            return sql + " ORDER BY " + sortExpression;
+        }
+        public static string CommaSeparate<T, U>(this IEnumerable<T> source, Func<T, U> func)
+        {
+            return string.Join(",", source.Select(s => func(s).ToString()).ToArray());
+        }
+        public static string Condation(this string sql, string ConditionExpression)
+        {
+            if (string.IsNullOrEmpty(ConditionExpression))
+                return sql;
+
+            return sql + " Where " + ConditionExpression;
+        }
+        public static string AddParamName(this string sql, string PropName)
+        {
+            if (string.IsNullOrEmpty(PropName))
+                return sql;
+
+            return  string.Format( "{0} Where {1} = @{1} " , sql , PropName);
+        }
+        
+
+        public static void ChangeLanguage(this ComboBox Cmb , EnumLst.Languages Lang) 
+        {
+            int CmbItemindex = Cmb.SelectedIndex;
+            
+            if (Lang == EnumLst.Languages.Arabic)
+                Cmb.DisplayMember = "ArabicCaption";
+            else
+                Cmb.DisplayMember = "EnglishCaption";
+
+            Cmb.SelectedIndex = CmbItemindex;
+        }
+         
+    }
+}
