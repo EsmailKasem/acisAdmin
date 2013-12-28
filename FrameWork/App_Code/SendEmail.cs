@@ -18,7 +18,7 @@ namespace FrameWork
         public string MyEmail = "sendemailtest502@gmail.com";
         public string PassWord = "147369852";
         #endregion
-
+//gfjghfjhgfhjgfjhgfhgjfghfju
         public bool SendEmailNow(string ReceiverName, string EmailAddress, string EmailSubject, string EmailSincerely, bool IsArabic, params  EmailGrid[] EmailContent)
         {
             string EmailDirection = IsArabic ? "DIR='RTL'" : "DIR='LTR'";
