@@ -70,7 +70,7 @@ namespace FrameWork
         }
 
     }
-
+public void Test(){}
     public class EmailGrid
     {
         public string GridHeader { get; set; }
